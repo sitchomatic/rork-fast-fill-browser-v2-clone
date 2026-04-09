@@ -264,7 +264,7 @@ class BrowserViewModel {
         let siteSetting = fetchSiteSetting(for: activeTab?.domain ?? "")
 
         let script: String
-        if let pending = pendingFillScript, currentRotationIndex == (currentRotationIndex) {
+        if let pending = pendingFillScript {
             script = pending
             pendingFillScript = nil
         } else {
