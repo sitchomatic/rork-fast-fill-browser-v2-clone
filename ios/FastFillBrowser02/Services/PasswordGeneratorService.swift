@@ -20,7 +20,16 @@ struct PasswordGeneratorService {
         var password = ""
 
         var randomBytes = [UInt8](repeating: 0, count: length)
-        _ = SecRandomCopyBytes(kSecRandomDefault, length, &randomBytes)
+        let status = SecRandomCopyBytes(kSecRandomDefault, length, &randomBytes)
+
+        if status != errSecSuccess {
+            var generator = SystemRandomNumberGenerator()
+            for _ in 0..<length {
+                let index = Int(generator.next(upperBound: UInt64(charArray.count)))
+                password.append(charArray[index])
+            }
+            return password
+        }
 
         for i in 0..<length {
             let index = Int(randomBytes[i]) % charArray.count

@@ -57,9 +57,16 @@ struct URLAliasService {
     static func matchingAliases(for query: String) -> [URLAlias] {
         guard !query.isEmpty else { return [] }
         let lowered = query.lowercased()
-        return allAliases.filter {
-            $0.shortcut.lowercased().contains(lowered) ||
-            $0.url.lowercased().contains(lowered)
+
+        let prefixMatches = allAliases.filter {
+            $0.shortcut.lowercased().hasPrefix(lowered)
         }
+        let containsMatches = allAliases.filter {
+            !$0.shortcut.lowercased().hasPrefix(lowered) &&
+            ($0.shortcut.lowercased().contains(lowered) ||
+             $0.url.lowercased().contains(lowered))
+        }
+
+        return prefixMatches + containsMatches
     }
 }

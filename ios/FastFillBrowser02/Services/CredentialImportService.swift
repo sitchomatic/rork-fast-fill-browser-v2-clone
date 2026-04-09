@@ -84,9 +84,28 @@ struct CredentialImportService {
         var current = ""
         var inQuotes = false
 
-        for char in line {
+        var iterator = line.makeIterator()
+        while let char = iterator.next() {
             if char == "\"" {
-                inQuotes.toggle()
+                if inQuotes {
+                    // Check for doubled quote (escaped quote inside quoted field)
+                    if let next = iterator.next() {
+                        if next == "\"" {
+                            current.append("\"")
+                        } else if next == "," {
+                            fields.append(current.trimmingCharacters(in: .whitespaces))
+                            current = ""
+                            inQuotes = false
+                        } else {
+                            current.append(next)
+                            inQuotes = false
+                        }
+                    } else {
+                        inQuotes = false
+                    }
+                } else {
+                    inQuotes = true
+                }
             } else if char == "," && !inQuotes {
                 fields.append(current.trimmingCharacters(in: .whitespaces))
                 current = ""

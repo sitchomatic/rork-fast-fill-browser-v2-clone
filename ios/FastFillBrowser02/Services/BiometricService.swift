@@ -23,8 +23,7 @@ class BiometricService {
 
         var error: NSError?
         guard context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) else {
-            isUnlocked = true
-            return true
+            return false
         }
 
         do {

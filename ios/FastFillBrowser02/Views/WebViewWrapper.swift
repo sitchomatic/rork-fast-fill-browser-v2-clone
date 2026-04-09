@@ -11,7 +11,9 @@ struct WebViewWrapper: UIViewRepresentable {
         let webView = WKWebView(frame: .zero, configuration: config)
         webView.navigationDelegate = context.coordinator
         webView.allowsBackForwardNavigationGestures = true
+        #if DEBUG
         webView.isInspectable = true
+        #endif
 
         tab.webView = webView
         tab.isWebViewActive = true

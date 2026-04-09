@@ -48,6 +48,7 @@ class BrowserViewModel {
     private var passwordCache: [String: String] = [:]
     private var siteSettingCache: [String: SiteSetting?] = [:]
     private var pendingFillScript: String?
+    private var pendingFillScriptIndex: Int?
     private var historyDebounceTask: Task<Void, Never>?
     private var lastHistoryURL: String = ""
     private var sureLoginTask: Task<Void, Never>?
@@ -78,6 +79,8 @@ class BrowserViewModel {
         tabs.remove(at: index)
         if activeTabIndex >= tabs.count {
             activeTabIndex = tabs.count - 1
+        } else if index < activeTabIndex {
+            activeTabIndex -= 1
         }
     }
 
@@ -102,8 +105,9 @@ class BrowserViewModel {
         let url: URL?
 
         // Check URL aliases first
-        if let aliasURL = URLAliasService.resolveAlias(trimmedInput) {
-            url = URL(string: aliasURL)
+        if let aliasURL = URLAliasService.resolveAlias(trimmedInput),
+           let resolvedURL = URL(string: aliasURL) {
+            url = resolvedURL
         } else if trimmedInput.hasPrefix("http://") || trimmedInput.hasPrefix("https://") {
             url = URL(string: trimmedInput)
         } else if trimmedInput.contains(".") && !trimmedInput.contains(" ") {
@@ -235,12 +239,14 @@ class BrowserViewModel {
     private func prewarmNextCredential() {
         guard matchingCredentials.count > 1 else {
             pendingFillScript = nil
+            pendingFillScriptIndex = nil
             return
         }
         let nextIndex = (currentRotationIndex + 1) % matchingCredentials.count
         let nextCredential = matchingCredentials[nextIndex]
         guard let password = passwordCache[nextCredential.id] else {
             pendingFillScript = nil
+            pendingFillScriptIndex = nil
             return
         }
         let siteSetting = fetchSiteSetting(for: activeTab?.domain ?? "")
@@ -250,6 +256,7 @@ class BrowserViewModel {
             usernameSelector: siteSetting?.usernameSelector,
             passwordSelector: siteSetting?.passwordSelector
         )
+        pendingFillScriptIndex = nextIndex
     }
 
     // MARK: - Credential Rotation (RC)
@@ -264,9 +271,10 @@ class BrowserViewModel {
         let siteSetting = fetchSiteSetting(for: activeTab?.domain ?? "")
 
         let script: String
-        if let pending = pendingFillScript {
+        if let pending = pendingFillScript, pendingFillScriptIndex == currentRotationIndex {
             script = pending
             pendingFillScript = nil
+            pendingFillScriptIndex = nil
         } else {
             guard let password = getCachedPassword(for: credential.id) else {
                 showToast("Password not found in keychain")
