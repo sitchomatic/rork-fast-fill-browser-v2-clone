@@ -22,7 +22,7 @@
 
 ## Overview
 
-Fast Fill Browser is a native iOS application that combines a full-featured web browser with a password manager and login automation engine. It is purpose-built for users who manage multiple credentials across various domains and need rapid credential switching, automated form filling, and session management.
+Fast Fill Browser is a native iOS application that combines a full-featured web browser with a password manager and login automation engine. It is purpose-built for users who manage multiple credentials across various domains. The app provides rapid credential switching, automated form filling, and per-domain session management.
 
 The app wraps WKWebView in a SwiftUI shell and layers on a credential vault protected by biometric authentication (Face ID / Touch ID / Optic ID). Passwords are stored exclusively in the iOS Keychain — never in the local database — while credential metadata, browsing history, bookmarks, and site-specific settings are persisted via SwiftData.
 
