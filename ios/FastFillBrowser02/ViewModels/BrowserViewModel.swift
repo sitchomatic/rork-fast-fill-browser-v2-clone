@@ -52,6 +52,7 @@ class BrowserViewModel {
     private var historyDebounceTask: Task<Void, Never>?
     private var lastHistoryURL: String = ""
     private var sureLoginTask: Task<Void, Never>?
+    private var toastHideTask: Task<Void, Never>?
 
     var activeTab: BrowserTab? {
         guard tabs.indices.contains(activeTabIndex) else { return nil }
@@ -545,8 +546,13 @@ class BrowserViewModel {
     func saveDetectedCredential() {
         guard let context = modelContext, let domain = activeTab?.domain else { return }
         let credential = Credential(domain: domain, username: detectedUsername)
+
+        guard KeychainService.shared.savePassword(detectedPassword, for: credential.id) else {
+            showToast("Failed to save credential for \(domain)")
+            return
+        }
+
         context.insert(credential)
-        _ = KeychainService.shared.savePassword(detectedPassword, for: credential.id)
         passwordCache[credential.id] = detectedPassword
         invalidateCredentialCache(for: domain)
         showToast("Credential saved for \(domain)")
@@ -557,11 +563,17 @@ class BrowserViewModel {
     // MARK: - Helpers
 
     func showToast(_ message: String) {
+        toastHideTask?.cancel()
         toastMessage = message
         withAnimation(.snappy) { toastVisible = true }
-        Task {
-            try? await Task.sleep(for: .seconds(2))
-            withAnimation(.snappy) { toastVisible = false }
+        toastHideTask = Task { @MainActor [weak self] in
+            do {
+                try await Task.sleep(for: .seconds(2))
+                guard !Task.isCancelled else { return }
+                withAnimation(.snappy) { self?.toastVisible = false }
+            } catch {
+                return
+            }
         }
     }
 }

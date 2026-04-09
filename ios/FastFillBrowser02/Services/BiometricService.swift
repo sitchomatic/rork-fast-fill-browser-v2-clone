@@ -1,5 +1,6 @@
 import LocalAuthentication
 import Foundation
+import Observation
 
 @Observable
 @MainActor

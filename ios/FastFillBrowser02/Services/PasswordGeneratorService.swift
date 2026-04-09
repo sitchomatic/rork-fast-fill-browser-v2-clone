@@ -51,7 +51,7 @@ struct PasswordGeneratorService {
         }
 
         var generator = SystemRandomNumberGenerator()
-        return Int(generator.next(upperBound: UInt64(upperBound)))
+        return Int.random(in: 0..<upperBound, using: &generator)
     }
 
     static func calculateStrength(_ password: String) -> PasswordStrength {

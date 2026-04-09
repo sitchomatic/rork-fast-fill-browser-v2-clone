@@ -23,8 +23,8 @@ class VaultViewModel {
                 username: item.username,
                 notes: item.notes
             )
-            context.insert(credential)
             if KeychainService.shared.savePassword(item.password, for: credential.id) {
+                context.insert(credential)
                 count += 1
             }
         }

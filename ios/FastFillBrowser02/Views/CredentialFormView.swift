@@ -68,8 +68,12 @@ struct CredentialFormView: View {
             username: username,
             notes: notes.isEmpty ? nil : notes
         )
+
+        guard KeychainService.shared.savePassword(password, for: credential.id) else {
+            return
+        }
+
         modelContext.insert(credential)
-        _ = KeychainService.shared.savePassword(password, for: credential.id)
         dismiss()
     }
 }

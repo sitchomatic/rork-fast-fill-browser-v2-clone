@@ -92,6 +92,7 @@ struct TabManagerView: View {
                         .padding(4)
                         .background(.quaternary, in: Circle())
                 }
+                .accessibilityLabel("Close tab")
                 .padding(6)
             }
         }
