@@ -17,7 +17,7 @@ struct URLAliasService {
         URLAliasProfile(
             name: "Joe Fortune",
             aliases: [
-                URLAlias(shortcut: "joep.win", url: "https://Joefortunepokies.win/login"),
+                URLAlias(shortcut: "joep.win", url: "https://joefortunepokies.win/login"),
                 URLAlias(shortcut: "joe.club", url: "https://joefortune.club/login"),
                 URLAlias(shortcut: "joe.eu.com", url: "https://joefortune.eu.com/login"),
                 URLAlias(shortcut: "joe.lv", url: "https://joefortune.lv/login"),
