@@ -25,13 +25,13 @@ enum ImportFormat: String, CaseIterable, Sendable {
 
 struct CredentialImportService {
     static func parseCSV(_ content: String, format: ImportFormat) -> [ImportedCredential] {
-        let lines = content.components(separatedBy: .newlines).filter { !$0.isEmpty }
-        guard lines.count > 1 else { return [] }
+        let records = parseCSVRecords(content)
+        guard records.count > 1 else { return [] }
 
         var results: [ImportedCredential] = []
 
-        for line in lines.dropFirst() {
-            let fields = parseCSVLine(line)
+        for record in records.dropFirst() {
+            let fields = parseCSVLine(record)
             guard fields.count >= 3 else { continue }
 
             let (urlField, userField, passField) = fieldIndices(for: format, fields: fields)
@@ -50,6 +50,60 @@ struct CredentialImportService {
         }
 
         return results
+    }
+
+    private static func parseCSVRecords(_ content: String) -> [String] {
+        var records: [String] = []
+        var currentRecord = ""
+        var isInsideQuotes = false
+        var index = content.startIndex
+
+        while index < content.endIndex {
+            let character = content[index]
+
+            if character == "\"" {
+                let nextIndex = content.index(after: index)
+                // RFC 4180: two consecutive quotes inside a quoted field represent a single literal quote
+                if isInsideQuotes, nextIndex < content.endIndex, content[nextIndex] == "\"" {
+                    currentRecord.append(character)
+                    currentRecord.append(content[nextIndex])
+                    index = content.index(after: nextIndex)
+                    continue
+                }
+
+                isInsideQuotes.toggle()
+                currentRecord.append(character)
+                index = nextIndex
+                continue
+            }
+
+            if !isInsideQuotes, character == "\n" || character == "\r" {
+                if !currentRecord.isEmpty {
+                    records.append(currentRecord)
+                    currentRecord = ""
+                }
+
+                if character == "\r" {
+                    let nextIndex = content.index(after: index)
+                    if nextIndex < content.endIndex, content[nextIndex] == "\n" {
+                        index = content.index(after: nextIndex)
+                        continue
+                    }
+                }
+
+                index = content.index(after: index)
+                continue
+            }
+
+            currentRecord.append(character)
+            index = content.index(after: index)
+        }
+
+        if !currentRecord.isEmpty {
+            records.append(currentRecord)
+        }
+
+        return records
     }
 
     private static func fieldIndices(

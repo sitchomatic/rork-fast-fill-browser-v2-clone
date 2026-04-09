@@ -6,12 +6,27 @@ final class WebViewConfigurationFactory {
     
     private(set) var contentRuleList: WKContentRuleList?
     private(set) var isReady: Bool = false
+    private var prepareTask: Task<Void, Never>?
 
     private init() {}
 
     func prepare() async {
-        await compileContentRules()
-        isReady = true
+        if isReady {
+            return
+        }
+
+        if let prepareTask {
+            await prepareTask.value
+            return
+        }
+
+        let task = Task { @MainActor in
+            await compileContentRules()
+            isReady = true
+        }
+
+        prepareTask = task
+        await task.value
     }
 
     func makeConfiguration() -> WKWebViewConfiguration {

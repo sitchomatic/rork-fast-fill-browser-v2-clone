@@ -100,21 +100,16 @@ struct ImportCredentialsView: View {
             let content = try String(contentsOf: url, encoding: .utf8)
             let imported = CredentialImportService.parseCSV(content, format: selectedFormat)
 
-            var credentials: [(Credential, String)] = []
+            var count = 0
             for item in imported {
                 let credential = Credential(domain: item.domain, username: item.username, notes: item.notes)
-                modelContext.insert(credential)
-                credentials.append((credential, item.password))
-            }
-
-            try modelContext.save()
-
-            var count = 0
-            for (credential, password) in credentials {
-                if KeychainService.shared.savePassword(password, for: credential.id) {
+                if KeychainService.shared.savePassword(item.password, for: credential.id) {
+                    modelContext.insert(credential)
                     count += 1
                 }
             }
+
+            try modelContext.save()
 
             importResult = "Successfully imported \(count) credentials"
         } catch {

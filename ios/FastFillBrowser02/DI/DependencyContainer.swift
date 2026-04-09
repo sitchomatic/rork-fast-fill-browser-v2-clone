@@ -1,8 +1,8 @@
 import Foundation
 
-final class DependencyValues: Sendable {
-    nonisolated(unsafe) static var current = DependencyValues()
-    nonisolated(unsafe) private var storage: [ObjectIdentifier: Any] = [:]
+final class DependencyValues {
+    static var current = DependencyValues()
+    private var storage: [ObjectIdentifier: Any] = [:]
 
     subscript<K: DependencyKey>(key: K.Type) -> K.Value {
         get {

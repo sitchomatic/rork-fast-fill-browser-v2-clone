@@ -20,24 +20,38 @@ struct PasswordGeneratorService {
         let charArray = Array(chars)
         var password = ""
 
-        var randomBytes = [UInt8](repeating: 0, count: length)
-        let status = SecRandomCopyBytes(kSecRandomDefault, length, &randomBytes)
-
-        if status != errSecSuccess {
-            var generator = SystemRandomNumberGenerator()
-            for _ in 0..<length {
-                let index = Int(generator.next(upperBound: UInt64(charArray.count)))
-                password.append(charArray[index])
-            }
-            return password
-        }
-
-        for i in 0..<length {
-            let index = Int(randomBytes[i]) % charArray.count
+        for _ in 0..<length {
+            let index = randomIndex(upperBound: charArray.count)
             password.append(charArray[index])
         }
 
         return password
+    }
+
+    private static func randomIndex(upperBound: Int) -> Int {
+        guard upperBound > 0 else { return 0 }
+
+        if upperBound <= 256 {
+            // Rejection sampling: discard values >= floor(256/upperBound)*upperBound
+            // to eliminate modulo bias from non-uniform byte distribution.
+            let acceptableUpperBound = (256 / upperBound) * upperBound
+            var randomByte: UInt8 = 0
+
+            while true {
+                let status = SecRandomCopyBytes(kSecRandomDefault, 1, &randomByte)
+                if status != errSecSuccess {
+                    break
+                }
+
+                let value = Int(randomByte)
+                if value < acceptableUpperBound {
+                    return value % upperBound
+                }
+            }
+        }
+
+        var generator = SystemRandomNumberGenerator()
+        return Int(generator.next(upperBound: UInt64(upperBound)))
     }
 
     static func calculateStrength(_ password: String) -> PasswordStrength {

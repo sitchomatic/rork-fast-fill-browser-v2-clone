@@ -43,7 +43,7 @@ struct WebViewWrapper: UIViewRepresentable {
             self.viewModel = viewModel
         }
 
-        nonisolated func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
             Task { @MainActor in
                 tab.isLoading = true
                 tab.canGoBack = webView.canGoBack
@@ -51,7 +51,7 @@ struct WebViewWrapper: UIViewRepresentable {
             }
         }
 
-        nonisolated func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+        func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
             Task { @MainActor in
                 tab.url = webView.url
                 tab.title = webView.title ?? "Loading..."
@@ -61,7 +61,7 @@ struct WebViewWrapper: UIViewRepresentable {
             }
         }
 
-        nonisolated func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             Task { @MainActor in
                 tab.isLoading = false
                 tab.url = webView.url
@@ -78,19 +78,19 @@ struct WebViewWrapper: UIViewRepresentable {
             }
         }
 
-        nonisolated func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
             Task { @MainActor in
                 tab.isLoading = false
             }
         }
 
-        nonisolated func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
             Task { @MainActor in
                 tab.isLoading = false
             }
         }
 
-        nonisolated func webView(
+        func webView(
             _ webView: WKWebView,
             decidePolicyFor navigationAction: WKNavigationAction
         ) async -> WKNavigationActionPolicy {

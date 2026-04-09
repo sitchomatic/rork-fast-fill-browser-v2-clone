@@ -29,8 +29,8 @@ struct BrowserView: View {
             }
         }
         .task {
-            viewModel.setup(modelContext: modelContext)
             await WebViewConfigurationFactory.shared.prepare()
+            viewModel.setup(modelContext: modelContext)
             DNSPrewarmService.shared.prewarmTopDomains(modelContext: modelContext)
         }
         .sheet(item: $viewModel.presentedSheet) { sheet in

@@ -248,21 +248,23 @@ class BrowserViewModel {
             pendingFillScriptIndex = nil
             return
         }
-        let nextIndex = (currentRotationIndex + 1) % matchingCredentials.count
-        let nextCredential = matchingCredentials[nextIndex]
-        guard let password = passwordCache[nextCredential.id] else {
+        // After rotateCredential increments currentRotationIndex, this precomputes
+        // the fill script for the current index (which is the next credential to fill).
+        let targetIndex = currentRotationIndex
+        let targetCredential = matchingCredentials[targetIndex]
+        guard let password = passwordCache[targetCredential.id] else {
             pendingFillScript = nil
             pendingFillScriptIndex = nil
             return
         }
         let siteSetting = fetchSiteSetting(for: activeTab?.domain ?? "")
         pendingFillScript = JavaScriptInjectionService.fillCredentialScript(
-            username: nextCredential.username,
+            username: targetCredential.username,
             password: password,
             usernameSelector: siteSetting?.usernameSelector,
             passwordSelector: siteSetting?.passwordSelector
         )
-        pendingFillScriptIndex = nextIndex
+        pendingFillScriptIndex = targetIndex
     }
 
     // MARK: - Credential Rotation (RC)
@@ -393,18 +395,24 @@ class BrowserViewModel {
 
         let dataStore = tab.webView?.configuration.websiteDataStore ?? WKWebsiteDataStore.default()
         let dataTypes = WKWebsiteDataStore.allWebsiteDataTypes()
+        let normalizedDomain = tab.domain.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
 
-        dataStore.fetchDataRecords(ofTypes: dataTypes) { records in
-            let domain = tab.domain
-            let matching = records.filter { record in
-                record.displayName.lowercased().contains(domain)
-            }
-            dataStore.removeData(ofTypes: dataTypes, for: matching) {
-                Task { @MainActor in
-                    if let url = lastURL {
-                        tab.webView?.load(URLRequest(url: url))
+        if !normalizedDomain.isEmpty {
+            dataStore.fetchDataRecords(ofTypes: dataTypes) { records in
+                let matching = records.filter { record in
+                    record.displayName.lowercased().contains(normalizedDomain)
+                }
+                dataStore.removeData(ofTypes: dataTypes, for: matching) {
+                    Task { @MainActor in
+                        if let url = lastURL {
+                            tab.webView?.load(URLRequest(url: url))
+                        }
                     }
                 }
+            }
+        } else if let url = lastURL {
+            Task { @MainActor in
+                tab.webView?.load(URLRequest(url: url))
             }
         }
 
