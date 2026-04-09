@@ -22,7 +22,7 @@ final class WebViewConfigurationFactory {
 
         let task = Task { @MainActor in
             await compileContentRules()
-            isReady = true
+            isReady = true  // Mark ready regardless—browsing works without rules, just unfiltered
         }
 
         prepareTask = task
@@ -70,6 +70,8 @@ final class WebViewConfigurationFactory {
                 forIdentifier: "FastFillBlocker",
                 encodedContentRuleList: rules
             )
-        } catch {}
+        } catch {
+            print("[WebViewConfigurationFactory] Failed to compile content rules: \(error)")
+        }
     }
 }

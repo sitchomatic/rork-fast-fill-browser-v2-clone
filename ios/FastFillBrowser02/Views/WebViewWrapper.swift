@@ -94,8 +94,7 @@ struct WebViewWrapper: UIViewRepresentable {
             _ webView: WKWebView,
             decidePolicyFor navigationAction: WKNavigationAction
         ) async -> WKNavigationActionPolicy {
-            let navType = await MainActor.run { navigationAction.navigationType }
-            if navType == .formSubmitted {
+            if navigationAction.navigationType == .formSubmitted {
                 await MainActor.run {
                     viewModel.detectAndOfferSave()
                 }

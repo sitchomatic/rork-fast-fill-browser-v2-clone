@@ -88,6 +88,12 @@ class BrowserViewModel {
         tabs[index].webView = nil
         tabs.remove(at: index)
         activeTabIndex = newActiveTabIndex
+
+        let newURL = activeTab?.displayURL ?? ""
+        if urlBarText != newURL {
+            urlBarText = newURL
+        }
+        aliasSuggestions = []
     }
 
     func switchToTab(at index: Int) {
