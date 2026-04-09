@@ -1,6 +1,6 @@
 import Foundation
 
-nonisolated struct CredentialDTO: Sendable, Identifiable {
+struct CredentialDTO: Sendable, Identifiable {
     let id: String
     let domain: String
     let username: String
@@ -28,7 +28,7 @@ nonisolated struct CredentialDTO: Sendable, Identifiable {
         self.usageCount = model.usageCount
     }
 
-    nonisolated init(
+    init(
         id: String,
         domain: String,
         username: String,

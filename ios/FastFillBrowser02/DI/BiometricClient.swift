@@ -1,13 +1,13 @@
 import Foundation
 import LocalAuthentication
 
-nonisolated enum BiometricType: Sendable {
+enum BiometricType: Sendable {
     case none
     case touchID
     case faceID
     case opticID
 
-    nonisolated var displayName: String {
+    var displayName: String {
         switch self {
         case .none: return "Biometrics"
         case .touchID: return "Touch ID"
@@ -17,20 +17,20 @@ nonisolated enum BiometricType: Sendable {
     }
 }
 
-nonisolated struct BiometricClient: Sendable {
+struct BiometricClient: Sendable {
     var checkAvailability: @Sendable () async -> BiometricType
     var authenticate: @Sendable (_ reason: String) async throws -> Bool
     var isAvailable: @Sendable () async -> Bool
 }
 
 extension BiometricClient {
-    nonisolated static let unimplemented = BiometricClient(
+    static let unimplemented = BiometricClient(
         checkAvailability: { fatalError("BiometricClient.checkAvailability unimplemented") },
         authenticate: { _ in fatalError("BiometricClient.authenticate unimplemented") },
         isAvailable: { fatalError("BiometricClient.isAvailable unimplemented") }
     )
 
-    nonisolated static let preview = BiometricClient(
+    static let preview = BiometricClient(
         checkAvailability: { .faceID },
         authenticate: { _ in true },
         isAvailable: { true }
@@ -38,8 +38,8 @@ extension BiometricClient {
 }
 
 private enum BiometricClientKey: DependencyKey {
-    nonisolated static let liveValue: BiometricClient = .unimplemented
-    nonisolated static let previewValue: BiometricClient = .preview
+    static let liveValue: BiometricClient = .unimplemented
+    static let previewValue: BiometricClient = .preview
 }
 
 extension DependencyValues {

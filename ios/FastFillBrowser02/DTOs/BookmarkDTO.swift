@@ -1,6 +1,6 @@
 import Foundation
 
-nonisolated struct BookmarkDTO: Sendable, Identifiable {
+struct BookmarkDTO: Sendable, Identifiable {
     let id: String
     let url: String
     let title: String
@@ -18,7 +18,7 @@ nonisolated struct BookmarkDTO: Sendable, Identifiable {
         self.sortOrder = model.sortOrder
     }
 
-    nonisolated init(
+    init(
         id: String = UUID().uuidString,
         url: String,
         title: String,

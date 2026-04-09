@@ -2,14 +2,14 @@ import Foundation
 import SwiftData
 import UniformTypeIdentifiers
 
-nonisolated struct ImportedCredential: Sendable {
+struct ImportedCredential: Sendable {
     let domain: String
     let username: String
     let password: String
     let notes: String?
 }
 
-nonisolated enum ImportFormat: String, CaseIterable, Sendable {
+enum ImportFormat: String, CaseIterable, Sendable {
     case chromeCSV = "Chrome CSV"
     case firefoxCSV = "Firefox CSV"
     case genericCSV = "Generic CSV"

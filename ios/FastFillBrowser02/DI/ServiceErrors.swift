@@ -1,13 +1,13 @@
 import Foundation
 
-nonisolated enum KeychainError: Error, Sendable, LocalizedError {
+enum KeychainError: Error, Sendable, LocalizedError {
     case saveFailed(OSStatus)
     case itemNotFound
     case dataConversionFailed
     case deleteFailed(OSStatus)
     case unexpectedStatus(OSStatus)
 
-    nonisolated var errorDescription: String? {
+    var errorDescription: String? {
         switch self {
         case .saveFailed(let status):
             return "Keychain save failed (status: \(status))"
@@ -23,7 +23,7 @@ nonisolated enum KeychainError: Error, Sendable, LocalizedError {
     }
 }
 
-nonisolated enum BiometricError: Error, Sendable, LocalizedError {
+enum BiometricError: Error, Sendable, LocalizedError {
     case notAvailable
     case authenticationFailed(String)
     case userCancelled
@@ -32,7 +32,7 @@ nonisolated enum BiometricError: Error, Sendable, LocalizedError {
     case biometryNotEnrolled
     case biometryLockedOut
 
-    nonisolated var errorDescription: String? {
+    var errorDescription: String? {
         switch self {
         case .notAvailable:
             return "Biometric authentication is not available"

@@ -39,18 +39,6 @@ struct TabManagerView: View {
                     .foregroundStyle(.primary)
 
                 Spacer()
-
-                if viewModel.tabs.count > 1 {
-                    Button {
-                        viewModel.closeTab(at: index)
-                    } label: {
-                        Image(systemName: "xmark")
-                            .font(.caption2.bold())
-                            .foregroundStyle(.secondary)
-                            .padding(4)
-                            .background(.quaternary, in: Circle())
-                    }
-                }
             }
 
             Text(tab.domain.isEmpty ? "New Tab" : tab.domain)
@@ -93,6 +81,20 @@ struct TabManagerView: View {
                     lineWidth: 2
                 )
         )
+        .overlay(alignment: .topTrailing) {
+            if viewModel.tabs.count > 1 {
+                Button {
+                    viewModel.closeTab(at: index)
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.caption2.bold())
+                        .foregroundStyle(.secondary)
+                        .padding(4)
+                        .background(.quaternary, in: Circle())
+                }
+                .padding(6)
+            }
+        }
         .contentShape(Rectangle())
         .onTapGesture {
             viewModel.switchToTab(at: index)

@@ -73,15 +73,21 @@ class BrowserViewModel {
     }
 
     func closeTab(at index: Int) {
-        guard tabs.count > 1 else { return }
+        guard tabs.count > 1, tabs.indices.contains(index) else { return }
+
+        let newActiveTabIndex: Int
+        if index < activeTabIndex {
+            newActiveTabIndex = activeTabIndex - 1
+        } else if index == activeTabIndex {
+            newActiveTabIndex = min(activeTabIndex, tabs.count - 2)
+        } else {
+            newActiveTabIndex = activeTabIndex
+        }
+
         tabs[index].webView?.stopLoading()
         tabs[index].webView = nil
         tabs.remove(at: index)
-        if activeTabIndex >= tabs.count {
-            activeTabIndex = tabs.count - 1
-        } else if index < activeTabIndex {
-            activeTabIndex -= 1
-        }
+        activeTabIndex = newActiveTabIndex
     }
 
     func switchToTab(at index: Int) {

@@ -1,7 +1,7 @@
 import Foundation
 import Security
 
-nonisolated final class KeychainService: Sendable {
+final class KeychainService: Sendable {
     static let shared = KeychainService()
     private let serviceIdentifier = "com.fastfillbrowser.credentials"
 

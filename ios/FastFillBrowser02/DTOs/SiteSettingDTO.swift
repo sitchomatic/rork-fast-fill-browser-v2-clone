@@ -1,6 +1,6 @@
 import Foundation
 
-nonisolated struct SiteSettingDTO: Sendable, Identifiable {
+struct SiteSettingDTO: Sendable, Identifiable {
     var id: String { domain }
 
     let domain: String
@@ -32,7 +32,7 @@ nonisolated struct SiteSettingDTO: Sendable, Identifiable {
         self.updatedAt = model.updatedAt
     }
 
-    nonisolated init(
+    init(
         domain: String,
         usernameSelector: String = "",
         passwordSelector: String = "",

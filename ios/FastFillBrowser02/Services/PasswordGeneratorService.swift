@@ -1,4 +1,5 @@
 import Foundation
+import Security
 
 struct PasswordGeneratorService {
     static func generate(

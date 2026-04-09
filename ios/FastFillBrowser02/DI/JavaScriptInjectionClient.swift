@@ -1,31 +1,31 @@
 import Foundation
 
-nonisolated struct FillCredentialRequest: Sendable {
+struct FillCredentialRequest: Sendable {
     let username: String
     let password: String
     let usernameSelector: String?
     let passwordSelector: String?
 }
 
-nonisolated struct FillResult: Sendable {
+struct FillResult: Sendable {
     let filledCount: Int
     let userFound: Bool
     let passFound: Bool
 }
 
-nonisolated struct LoginFormDetection: Sendable {
+struct LoginFormDetection: Sendable {
     let hasLoginForm: Bool
     let passwordFieldCount: Int
     let loginFormCount: Int
 }
 
-nonisolated struct ExtractedCredentials: Sendable {
+struct ExtractedCredentials: Sendable {
     let found: Bool
     let username: String
     let password: String
 }
 
-nonisolated struct JavaScriptInjectionClient: Sendable {
+struct JavaScriptInjectionClient: Sendable {
     var fillHelperScript: @Sendable () -> String
     var fillCredentialScript: @Sendable (_ request: FillCredentialRequest) -> String
     var submitFormScript: @Sendable (_ submitSelector: String?) -> String
@@ -34,7 +34,7 @@ nonisolated struct JavaScriptInjectionClient: Sendable {
 }
 
 extension JavaScriptInjectionClient {
-    nonisolated static let unimplemented = JavaScriptInjectionClient(
+    static let unimplemented = JavaScriptInjectionClient(
         fillHelperScript: { fatalError("JavaScriptInjectionClient.fillHelperScript unimplemented") },
         fillCredentialScript: { _ in fatalError("JavaScriptInjectionClient.fillCredentialScript unimplemented") },
         submitFormScript: { _ in fatalError("JavaScriptInjectionClient.submitFormScript unimplemented") },
@@ -42,7 +42,7 @@ extension JavaScriptInjectionClient {
         extractFilledCredentialsScript: { fatalError("JavaScriptInjectionClient.extractFilledCredentialsScript unimplemented") }
     )
 
-    nonisolated static let preview = JavaScriptInjectionClient(
+    static let preview = JavaScriptInjectionClient(
         fillHelperScript: { "" },
         fillCredentialScript: { _ in "" },
         submitFormScript: { _ in "" },
@@ -52,8 +52,8 @@ extension JavaScriptInjectionClient {
 }
 
 private enum JavaScriptInjectionClientKey: DependencyKey {
-    nonisolated static let liveValue: JavaScriptInjectionClient = .unimplemented
-    nonisolated static let previewValue: JavaScriptInjectionClient = .preview
+    static let liveValue: JavaScriptInjectionClient = .unimplemented
+    static let previewValue: JavaScriptInjectionClient = .preview
 }
 
 extension DependencyValues {

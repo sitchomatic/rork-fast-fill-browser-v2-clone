@@ -1,6 +1,6 @@
 import Foundation
 
-nonisolated struct BrowsingHistoryEntryDTO: Sendable, Identifiable {
+struct BrowsingHistoryEntryDTO: Sendable, Identifiable {
     let id: String
     let url: String
     let title: String
@@ -16,7 +16,7 @@ nonisolated struct BrowsingHistoryEntryDTO: Sendable, Identifiable {
         self.visitedAt = model.visitedAt
     }
 
-    nonisolated init(
+    init(
         id: String = UUID().uuidString,
         url: String,
         title: String,

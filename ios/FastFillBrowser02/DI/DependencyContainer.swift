@@ -1,6 +1,6 @@
 import Foundation
 
-nonisolated final class DependencyValues: Sendable {
+final class DependencyValues: Sendable {
     nonisolated(unsafe) static var current = DependencyValues()
     nonisolated(unsafe) private var storage: [ObjectIdentifier: Any] = [:]
 
@@ -24,7 +24,7 @@ nonisolated final class DependencyValues: Sendable {
     }
 }
 
-nonisolated protocol DependencyKey {
+protocol DependencyKey {
     associatedtype Value: Sendable
     static var liveValue: Value { get }
     static var testValue: Value { get }
@@ -32,8 +32,8 @@ nonisolated protocol DependencyKey {
 }
 
 extension DependencyKey {
-    nonisolated static var testValue: Value { liveValue }
-    nonisolated static var previewValue: Value { liveValue }
+    static var testValue: Value { liveValue }
+    static var previewValue: Value { liveValue }
 }
 
 @propertyWrapper

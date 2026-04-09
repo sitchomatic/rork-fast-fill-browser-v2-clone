@@ -84,7 +84,7 @@ struct BrowserView: View {
                     viewModel.navigateTo(viewModel.urlBarText)
                     isURLBarFocused = false
                 }
-                .onChange(of: viewModel.urlBarText) {
+                .onChange(of: viewModel.urlBarText) { _, _ in
                     if isURLBarFocused {
                         viewModel.updateAliasSuggestions()
                     }
