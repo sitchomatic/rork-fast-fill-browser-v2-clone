@@ -567,13 +567,9 @@ class BrowserViewModel {
         toastMessage = message
         withAnimation(.snappy) { toastVisible = true }
         toastHideTask = Task { @MainActor [weak self] in
-            do {
-                try await Task.sleep(for: .seconds(2))
-                guard !Task.isCancelled else { return }
-                withAnimation(.snappy) { self?.toastVisible = false }
-            } catch {
-                return
-            }
+            try? await Task.sleep(for: .seconds(2))
+            guard !Task.isCancelled else { return }
+            withAnimation(.snappy) { self?.toastVisible = false }
         }
     }
 }

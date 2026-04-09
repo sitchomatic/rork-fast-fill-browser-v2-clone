@@ -45,6 +45,10 @@ struct WebViewWrapper: UIViewRepresentable {
             self.viewModel = viewModel
         }
 
+        deinit {
+            progressObservation?.invalidate()
+        }
+
         func observeProgress(of webView: WKWebView) {
             progressObservation = webView.observe(\.estimatedProgress, options: [.new]) { [weak self] webView, _ in
                 Task { @MainActor [weak self] in
