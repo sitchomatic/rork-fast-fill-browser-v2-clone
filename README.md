@@ -128,6 +128,8 @@ The app follows a **Model-View-ViewModel (MVVM)** architecture built on modern S
 
 ## Project Structure
 
+> **Note:** The iOS source code is located in the `ios/` directory. The tree below reflects the project layout when the app source is present.
+
 ```
 ios/
 ├── FastFillBrowser02/
@@ -299,11 +301,11 @@ On app launch, the `DNSPrewarmService` identifies the top 10 most-visited domain
    cd rork-fast-fill-browser-v2-clone
    ```
 
-2. Open the Xcode project:
+2. Open the Xcode project or workspace from the repository root:
    ```bash
    open ios/FastFillBrowser02.xcodeproj
    ```
-   *(or open the `.xcworkspace` if present)*
+   *If the repository includes an `.xcworkspace`, open that instead.*
 
 3. Select your target device or simulator.
 
@@ -359,6 +361,6 @@ Access via the site settings icon for the current domain:
 
 ---
 
-## License
+## Credits
 
 Created by Rork.
