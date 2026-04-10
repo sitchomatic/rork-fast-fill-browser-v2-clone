@@ -1,7 +1,7 @@
 import Foundation
 
-final class DependencyValues {
-    static var current = DependencyValues()
+final class DependencyValues: @unchecked Sendable {
+    nonisolated(unsafe) static var current = DependencyValues()
     private var storage: [ObjectIdentifier: Any] = [:]
 
     subscript<K: DependencyKey>(key: K.Type) -> K.Value {
@@ -37,10 +37,10 @@ extension DependencyKey {
 }
 
 @propertyWrapper
-struct Dependency<Value: Sendable>: Sendable {
-    private let keyPath: KeyPath<DependencyValues, Value> & Sendable
+struct Dependency<Value: Sendable>: @unchecked Sendable {
+    private let keyPath: KeyPath<DependencyValues, Value>
 
-    init(_ keyPath: KeyPath<DependencyValues, Value> & Sendable) {
+    init(_ keyPath: KeyPath<DependencyValues, Value>) {
         self.keyPath = keyPath
     }
 
