@@ -1,5 +1,6 @@
 import Foundation
 
+@MainActor
 final class DependencyValues {
     static var current = DependencyValues()
     private var storage: [ObjectIdentifier: Any] = [:]
@@ -44,7 +45,7 @@ struct Dependency<Value: Sendable>: Sendable {
         self.keyPath = keyPath
     }
 
-    var wrappedValue: Value {
+    @MainActor var wrappedValue: Value {
         DependencyValues.current[keyPath: keyPath]
     }
 }
