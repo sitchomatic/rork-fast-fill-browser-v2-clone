@@ -58,7 +58,8 @@ final class WebViewConfigurationFactory {
     private func compileContentRules() async {
         let rules = """
         [
-            {"trigger":{"url-filter":".*","resource-type":["script"],"url-filter-is-case-sensitive":false,"if-domain":["*doubleclick.net","*googlesyndication.com","*googleadservices.com","*google-analytics.com","*facebook.net","*facebook.com/tr","*analytics.google.com"]},"action":{"type":"block"}},
+            {"trigger":{"url-filter":".*","resource-type":["script"],"url-filter-is-case-sensitive":false,"if-domain":["*doubleclick.net","*googlesyndication.com","*googleadservices.com","*google-analytics.com","*facebook.net","*facebook.com","*analytics.google.com"]},"action":{"type":"block"}},
+            {"trigger":{"url-filter":"https?://([^/]+\\\\.)?facebook\\\\.com/tr","resource-type":["script","image","raw"]},"action":{"type":"block"}},
             {"trigger":{"url-filter":".*","resource-type":["script","image","raw"],"url-filter-is-case-sensitive":false,"if-domain":["*hotjar.com","*mixpanel.com","*segment.io","*amplitude.com","*optimizely.com","*crazyegg.com","*mouseflow.com","*fullstory.com"]},"action":{"type":"block"}},
             {"trigger":{"url-filter":".*\\\\.ads\\\\..*"},"action":{"type":"block"}},
             {"trigger":{"url-filter":".*track(ing|er).*","resource-type":["script","raw"]},"action":{"type":"block"}}

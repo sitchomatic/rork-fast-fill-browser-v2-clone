@@ -227,7 +227,7 @@ struct BrowserView: View {
             rcButton
 
             toolbarButton(icon: "flame.fill", tint: .red) {
-                viewModel.burnCurrentTab()
+                Task { await viewModel.burnCurrentTab() }
             }
 
             toolbarButton(icon: "key.fill") {

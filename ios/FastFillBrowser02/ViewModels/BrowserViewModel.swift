@@ -46,7 +46,8 @@ class BrowserViewModel {
     private var modelContext: ModelContext?
     private var credentialCache: [String: [Credential]] = [:]
     private var passwordCache: [String: String] = [:]
-    private var siteSettingCache: [String: SiteSetting?] = [:]
+    private var siteSettingCache: [String: SiteSetting] = [:]
+    private var missingSiteSettingDomains = Set<String>()
     private var pendingFillScript: String?
     private var pendingFillScriptIndex: Int?
     private var historyDebounceTask: Task<Void, Never>?
@@ -127,7 +128,7 @@ class BrowserViewModel {
             url = URL(string: "https://\(trimmedInput)")
         } else {
             let query = trimmedInput.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? trimmedInput
-            url = URL(string: "https://www.google.com/search?q=\(query)")
+            url = URL(string: searchURL(for: query))
         }
 
         guard let validURL = url else { return }
@@ -233,18 +234,28 @@ class BrowserViewModel {
         if let cached = siteSettingCache[lowDomain] {
             return cached
         }
+        if missingSiteSettingDomains.contains(lowDomain) {
+            return nil
+        }
 
         guard let context = modelContext else { return nil }
         let descriptor = FetchDescriptor<SiteSetting>(
             predicate: #Predicate<SiteSetting> { $0.domain == lowDomain }
         )
         let result = try? context.fetch(descriptor).first
-        siteSettingCache[lowDomain] = result
+        if let result {
+            siteSettingCache[lowDomain] = result
+            missingSiteSettingDomains.remove(lowDomain)
+        } else {
+            missingSiteSettingDomains.insert(lowDomain)
+        }
         return result
     }
 
     func invalidateSiteSettingCache(for domain: String) {
-        siteSettingCache.removeValue(forKey: domain.lowercased())
+        let lowDomain = domain.lowercased()
+        siteSettingCache.removeValue(forKey: lowDomain)
+        missingSiteSettingDomains.remove(lowDomain)
     }
 
     // MARK: - Pre-warm Next Credential (#16)
@@ -396,7 +407,7 @@ class BrowserViewModel {
 
     // MARK: - Burn
 
-    func burnCurrentTab() {
+    func burnCurrentTab() async {
         guard let tab = activeTab else { return }
         let lastURL = tab.lastURL ?? tab.url
 
@@ -405,22 +416,16 @@ class BrowserViewModel {
         let normalizedDomain = tab.domain.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
 
         if !normalizedDomain.isEmpty {
-            dataStore.fetchDataRecords(ofTypes: dataTypes) { records in
-                let matching = records.filter { record in
-                    record.displayName.lowercased().contains(normalizedDomain)
-                }
-                dataStore.removeData(ofTypes: dataTypes, for: matching) {
-                    Task { @MainActor in
-                        if let url = lastURL {
-                            tab.webView?.load(URLRequest(url: url))
-                        }
-                    }
-                }
+            let records = await dataStore.dataRecords(ofTypes: dataTypes)
+            let matching = records.filter { record in
+                record.displayName.lowercased().contains(normalizedDomain)
             }
-        } else if let url = lastURL {
-            Task { @MainActor in
+            await dataStore.removeData(ofTypes: dataTypes, for: matching)
+            if let url = lastURL {
                 tab.webView?.load(URLRequest(url: url))
             }
+        } else if let url = lastURL {
+            tab.webView?.load(URLRequest(url: url))
         }
 
         if let context = modelContext {
@@ -445,9 +450,8 @@ class BrowserViewModel {
         guard siteSetting?.isAutoRCEnabled == true else { return }
 
         if siteSetting?.isAutoBurnOnRC == true {
-            burnCurrentTab()
             Task {
-                try? await Task.sleep(for: .seconds(1.5))
+                await burnCurrentTab()
                 rotateCredential()
             }
         } else {
@@ -570,6 +574,18 @@ class BrowserViewModel {
             try? await Task.sleep(for: .seconds(2))
             guard !Task.isCancelled else { return }
             withAnimation(.snappy) { self?.toastVisible = false }
+        }
+    }
+
+    private func searchURL(for query: String) -> String {
+        let engine = UserDefaults.standard.string(forKey: "defaultSearchEngine") ?? "Google"
+        switch engine {
+        case "DuckDuckGo":
+            return "https://duckduckgo.com/?q=\(query)"
+        case "Bing":
+            return "https://www.bing.com/search?q=\(query)"
+        default:
+            return "https://www.google.com/search?q=\(query)"
         }
     }
 }
